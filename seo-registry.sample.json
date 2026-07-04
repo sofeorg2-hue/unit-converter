@@ -1,0 +1,6 @@
+[
+  { "slug": "acres-to-hectares", "category": "area", "from": "acre", "to": "hectare", "title": "Acres to Hectares" },
+  { "slug": "meters-to-feet", "category": "length", "from": "meter", "to": "foot", "title": "Meters to Feet" },
+  { "slug": "celsius-to-fahrenheit", "category": "temperature", "from": "celsius", "to": "fahrenheit", "title": "Celsius to Fahrenheit" },
+  { "slug": "gb-to-mb", "category": "digital", "from": "gigabyte", "to": "megabyte", "title": "GB to MB" }
+]
