@@ -1,0 +1,57 @@
+Title: chore(seo): repair seo-registry.json, add sitemap tooling (draft)
+
+Summary
+- Applied a best‑effort automated repair to seo-registry.json on branch fix/seo-registry-repair:
+  - Normalized field names (defaultValue -> value).
+  - Removed exact duplicate slug entries (kept the most complete entry).
+  - Applied safe, limited heuristic fills for well-known missing entries (e.g., acre ↔ hectare).
+- Added tooling to support regeneration and validation of sitemap URLs:
+  - tools/audit-seo-registry.js — audits registry completeness and sitemap/registry consistency.
+  - tools/auto-repair-seo-registry.js — automatic best-effort repairs (creates a backup).
+  - tools/generate-sitemap.js — generates sitemap.xml from seo-registry.json.
+  - tools/validate-sitemap.js — Puppeteer-based validator to test sitemap URLs and produce a JSON report.
+
+Files changed
+- seo-registry.json (rewritten by auto-repair; backup created: seo-registry.json.bak.<timestamp>)
+- tools/auto-repair-seo-registry.js
+- tools/audit-seo-registry.js
+- tools/generate-sitemap.js
+- tools/validate-sitemap.js
+
+How to validate locally (recommended)
+1. git fetch origin && git checkout fix/seo-registry-repair
+2. npm install
+3. Optional audit: node tools/audit-seo-registry.js sitemap.xml (writes tools/audit-seo-registry-report.json)
+4. Auto-repair (writes backup and a report): node tools/auto-repair-seo-registry.js (writes tools/auto-repair-report.json)
+5. Regenerate sitemap: node tools/generate-sitemap.js sitemap.xml https://theuniversalconverter.com
+6. Install validator deps (if not already): npm install puppeteer xml2js axios
+7. Run headless validator: node tools/validate-sitemap.js sitemap.xml (writes tools/validate-sitemap-report.json)
+
+Acceptance criteria for making PR ready
+- tools/validate-sitemap-report.json shows zero failures.
+- 0 unresolved slugs, 0 incomplete registry entries, 0 duplicate slugs, 0 missing slugs.
+- 0 category mismatches, 0 unit ID mismatches.
+- Every sitemap URL:
+  - Opens successfully,
+  - Opens the shared Converter page,
+  - Includes category, from, to, value and slug parameters,
+  - Automatically preloads the correct category/from/to and calculates immediately.
+
+Next steps after you run validation
+- Paste tools/validate-sitemap-report.json here and I will:
+  - Parse failures, identify exact offending registry entries by slug,
+  - Produce exact corrected seo-registry.json objects and git patches,
+  - Commit iterative fixes to this branch and update the PR until validation shows zero failures.
+- When the branch is validated, I will provide the final annotated report, counts (URLs tested, entries repaired, iterations), and the PR can be marked ready for review/merge.
+
+Notes / Troubleshooting
+- I cannot create the PR from this environment; use the gh CLI command below or the browser link.
+- If Puppeteer fails to launch on your host, run inside a container that supports Chromium or install the system libs listed in the scripts’ comments; paste any error and I’ll help fix it.
+
+CLI to create draft PR (run locally):
+
+  gh pr create --fill --draft -B main -H fix/seo-registry-repair --title "chore(seo): repair seo-registry.json, add sitemap tooling (draft)" --body-file pr-body.txt
+
+Browser URL to start PR:
+
+  https://github.com/sofeorg2-hue/unit-converter/compare/main...fix/seo-registry-repair
